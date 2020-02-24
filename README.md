@@ -1,1 +1,3 @@
 # Function Plotter
+
+Plots functions.
