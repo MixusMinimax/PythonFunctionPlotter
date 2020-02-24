@@ -1,6 +1,9 @@
 import math
+import pygame_textinput
 import pygame
+import re
 from point import Point
+import functions
 from functions import *
 from utils import *
 pygame.init()
@@ -13,17 +16,20 @@ RED = (255, 0, 0)
 # constants
 WIDTH = 800
 HEIGHT = 600
+INPUT_HEIGHT = 50
 RESOLUTION = 512
 BACKGROUND = (220, 200, 240)
 LINE_OFFSET = 32
 MIN_X = -5
 MAX_X = 5
-MIN_Y = -1.1
-MAX_Y = 4.2
+MIN_Y = -1
+MAX_Y = 6.5
 DRAW_POINTS = False
 
 # pygame
-game_display = pygame.display.set_mode((WIDTH, HEIGHT))
+textinput = pygame_textinput.TextInput()
+
+game_display = pygame.display.set_mode((WIDTH, HEIGHT + INPUT_HEIGHT))
 pygame.display.set_caption('2D Function Plotter')
 clock = pygame.time.Clock()
 font = pygame.font.SysFont('Arial', 12)
@@ -150,15 +156,33 @@ def update(function):
 		- (text.get_width(), text.get_height() // 2))
 
 def main():
-	function = (Exp(X()) + Exp(-X())) / 2 + Random(0) * 0.2
+	function = eval('(Exp(X()) + Exp(-X())) / 2 + Random(0) * 0.2')
+	replaces = [('x', 'X()'), ('exp', 'Exp'), ('sin', 'Sin'), ('cos', 'Cos'),\
+		('random', 'Random'), ('t', 'Time()')]
 	while True:
-		for event in pygame.event.get():
+		events = pygame.event.get()
+		for event in events:
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				quit()
 
+		# input
+		if textinput.update(events):
+			t = textinput.get_text()
+			for pair in replaces:
+				t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
+			try:
+				f = eval(t)
+				if isinstance(f, Function):
+					function = f
+			except:
+				print('Error')
+			print(t)
+
 		# logic
 		update(function)
+		functions.time += 1
+		game_display.blit(textinput.get_surface(), (10, HEIGHT + 10))
 		pygame.display.update()
 		clock.tick(60)
 

@@ -1,8 +1,10 @@
 import numpy as np
 import math
+import time
 import random
 from abc import ABCMeta, abstractmethod
 
+time = 0
 
 class Function:
 
@@ -79,10 +81,13 @@ class Constant(Function):
 class Random(Function):
 
 	def __init__(self, seed):
+		if isinstance(seed, (int, float)):
+			seed = Constant(seed)
+		if not isinstance(seed, Function): raise TypeError
 		self.seed = seed
 
 	def sample(self, x):
-		#random.seed(a=int(x * 10 * self.seed))
+		random.seed(a=int((self.seed.sample(x) * 1000)))
 		return random.randint(0, 1000) / 1000.0
 
 	def __str__(self):
@@ -181,3 +186,11 @@ class Exp(Function):
 
 	def __str__(self):
 		return 'exp({})'.format(self.input)
+
+class Time(Function):
+
+	def sample(self, x):
+		return time / 60
+
+	def __str__(self):
+		return 't'
