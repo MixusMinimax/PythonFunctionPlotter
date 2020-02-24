@@ -172,7 +172,7 @@ def main():
 			for pair in replaces:
 				t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
 			try:
-				f = eval(t)
+				f = eval('Constant(0)+' + t)
 				if isinstance(f, Function):
 					function = f
 			except:
