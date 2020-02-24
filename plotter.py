@@ -1,6 +1,7 @@
 import pygame
 from point import Point
 from functions import *
+from utils import *
 
 # colors
 
@@ -26,19 +27,6 @@ DRAW_POINTS = False
 game_display = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('2D Function Plotter')
 clock = pygame.time.Clock()
-
-
-
-def map_range(val, oldmin, oldmax, min, max):
-	return (val - oldmin) / (oldmax - oldmin) * (max - min) + min
-
-def clamp(val, min, max):
-	if val <= min: return min
-	if val >= max: return max
-	return val
-
-def clamp01(val):
-	return clamp(val, 0, 1)
 
 def uv_to_screen(point):
 	copy = Point(point)
