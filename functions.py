@@ -6,6 +6,11 @@ from abc import ABCMeta, abstractmethod
 
 time = 0
 
+def check_function(function):
+	if not isinstance(function, Function):
+		raise TypeError
+
+
 class Function:
 
 	@abstractmethod
@@ -42,6 +47,12 @@ class Function:
 
 	def __rmul__(self, other):
 		return self * other
+
+	def __mod__(self, other):
+		if isinstance(other, (int, float)):
+			return Modulo(self, Constant(other))
+		if not isinstance(other, Function): raise TypeError
+		return Modulo(self, other)
 
 	def __truediv__(self, other):
 		if isinstance(other, (int, float)):
@@ -125,6 +136,19 @@ class Product(Function):
 
 	def __str__(self):
 		return '(' + ' * '.join([str(f) for f in self.factors]) + ')'
+
+
+class Modulo(Function):
+
+	def __init__(self, a, b):
+		self.a = a
+		self.b = b
+
+	def sample(self, x):
+		return self.a.sample(x) % self.b.sample(x)
+
+	def __str__(self):
+		return '{} % {}'.format(self.a, self.b)
 
 
 class Fraction(Function):

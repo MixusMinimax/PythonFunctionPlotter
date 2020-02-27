@@ -17,7 +17,7 @@ RED = (255, 0, 0)
 WIDTH = 800
 HEIGHT = 600
 INPUT_HEIGHT = 50
-RESOLUTION = 512
+RESOLUTION = 256
 BACKGROUND = (220, 200, 240)
 LINE_OFFSET = 32
 MIN_X = -5
@@ -131,14 +131,26 @@ def update(function):
 	exceed = 0 # 1: top, 0: between, -1: bottom
 	for i in range(RESOLUTION):
 		x = i / (RESOLUTION - 1)
-		y = map_range(function.sample(map_range(x, 0, 1, MIN_X, MAX_X)), MIN_Y, MAX_Y, 0, 1)
-		exceed_new = 1 if y > 1 else -1 if y < 0 else 0
-		if exceed * exceed_new == -1:
+		try:
+			y = map_range(function.sample(map_range(x, 0, 1, MIN_X, MAX_X)), MIN_Y, MAX_Y, 0, 1)
+		except:
+			y = None
+
+		try:
+			exceed_new = 1 if y > 1 else -1 if y < 0 else 0
+		except:
+			exceed_new = 0
+
+		if y == None or exceed * exceed_new == -1:
 			if len(points) != 0:
 				points_list.append(points)
 				points = []
 		exceed = exceed_new
-		points.append(uv_to_screen((x, y)))
+		try:
+			points.append(uv_to_screen((x, y)))
+		except:
+			pass
+
 		if i == RESOLUTION - 2 and len(points) != 0:
 			points_list.append(points)
 
@@ -148,10 +160,10 @@ def update(function):
 
 	if DRAW_POINTS:
 		for point in points:
-			pygame.draw.circle(game_display, RED, point, 3)
+			pygame.draw.circle(game_display, RED, (int(point[0]), int(point[1])), 3)
 
 	# draw function string
-	text = font2.render('f(x) = {}'.format(function), True, BLACK)
+	text = font2.render('f(x) = {}'.format(function.summands[1]), True, BLACK)
 	game_display.blit(text, Point((WIDTH - LINE_OFFSET, LINE_OFFSET))\
 		- (text.get_width(), text.get_height() // 2))
 
@@ -175,9 +187,9 @@ def main():
 				f = eval('Constant(0)+' + t)
 				if isinstance(f, Function):
 					function = f
+					print(function)
 			except:
 				print('Error')
-			print(t)
 
 		# logic
 		update(function)
