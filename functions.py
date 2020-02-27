@@ -186,6 +186,7 @@ class Sum(Function):
 			else:
 				counts[str(f)] = [f, 1]
 
+		changed = False
 		new_summands = []
 		for key in counts:
 			pair = counts[key]
@@ -194,9 +195,11 @@ class Sum(Function):
 			if count == 1:
 				new_summands.append(f)
 			elif count > 1:
+				changed = True
 				new_summands.append(Product((Constant(count), f)))
 
-		return Sum(new_summands)
+		ret = Sum(new_summands)
+		return ret.simplify() if changed else ret
 
 	def __str__(self):
 		s = ' + '.join([str(f) for f in self.summands])
