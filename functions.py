@@ -226,7 +226,20 @@ class Product(Function):
 		factors = [f.simplify() for f in self.factors]
 		if 0 in [f.value for f in factors if isinstance(f, Constant)]:
 			return Constant(0)
-		return self
+
+		# flatmap nested products
+		products = [f.factors for f in factors if isinstance(f, Product)]
+		flatmappedproducts = [f for fs in products for f in fs]
+		factors = [f for f in factors if not isinstance(f, Product)]
+		factors.extend(flatmappedproducts)
+
+		# simplify constants into one
+		simplified_constant = Constant(np.prod([f.value for f in factors if isinstance(f, Constant)]))
+		factors = [f for f in factors if not isinstance(f, Constant)]
+		if len(factors) == 0 or simplified_constant.value != 1:
+			factors.append(simplified_constant)
+
+		return Product(factors)
 
 	def __str__(self):
 		s = ' * '.join([str(f) for f in self.factors])
