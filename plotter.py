@@ -169,8 +169,6 @@ def update(function):
 
 def main():
 	function = eval('(Exp(X()) + Exp(-X())) / 2 + Random(0) * 0.2')
-	replaces = [('x', 'X()'), ('exp', 'Exp'), ('sin', 'Sin'), ('cos', 'Cos'),\
-		('random', 'Random'), ('t', 'Time()')]
 	while True:
 		events = pygame.event.get()
 		for event in events:
@@ -180,14 +178,8 @@ def main():
 
 		# input
 		if textinput.update(events):
-			t = textinput.get_text()
-			for pair in replaces:
-				t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
 			try:
-				f = eval('Constant(0)+' + t)
-				if isinstance(f, Function):
-					function = f
-					print(function)
+				function = Function.parse(textinput.get_text())
 			except:
 				print('Error')
 
