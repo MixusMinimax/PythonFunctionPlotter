@@ -163,7 +163,7 @@ def update(function):
 			pygame.draw.circle(game_display, RED, (int(point[0]), int(point[1])), 3)
 
 	# draw function string
-	text = font2.render('f(x) = {}'.format(function.summands[1]), True, BLACK)
+	text = font2.render('f(x) = {}'.format(function), True, BLACK)
 	game_display.blit(text, Point((WIDTH - LINE_OFFSET, LINE_OFFSET))\
 		- (text.get_width(), text.get_height() // 2))
 
@@ -180,9 +180,9 @@ def main():
 		if textinput.update(events):
 			try:
 				function = Function.parse(textinput.get_text())
-			except:
-				print('Error')
-
+			except Exception as e:
+				print(e)
+			
 		# logic
 		update(function)
 		functions.time += 1

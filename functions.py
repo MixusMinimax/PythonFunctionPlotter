@@ -161,13 +161,49 @@ class Sum(Function):
 		return sum((f.sample(x) for f in self.summands))
 
 	def derivative(self):
-		return Sum([f.derivative() for f in self.summands])
+		return Sum([f.derivative() for f in self.summands]).simplify()
 
 	def simplify(self):
-		return self
+		summands = [f.simplify() for f in self.summands]
+
+		# flatmap nested sums
+		sums = [f.summands for f in summands if isinstance(f, Sum)]
+		flatmappedsums = [f for fs in sums for f in fs]
+		summands = [f for f in summands if not isinstance(f, Sum)]
+		summands.extend(flatmappedsums)
+
+		# simplify constants into one
+		simplified_constant = Constant(sum([f.value for f in summands if isinstance(f, Constant)]))
+		summands = [f for f in summands if not isinstance(f, Constant)]
+		if len(summands) == 0 or simplified_constant.value != 0:
+			summands.append(simplified_constant)
+
+		# factorize sames
+		counts = dict()
+		for f in summands:
+			if str(f) in counts:
+				counts[str(f)][1] += 1
+			else:
+				counts[str(f)] = [f, 1]
+
+		new_summands = []
+		for key in counts:
+			pair = counts[key]
+			f = pair[0]
+			count = pair[1]
+			if count == 1:
+				new_summands.append(f)
+			elif count > 1:
+				new_summands.append(Product((Constant(count), f)))
+
+		return Sum(new_summands)
 
 	def __str__(self):
-		return '(' + ' + '.join([str(f) for f in self.summands]) + ')'
+		s = ' + '.join([str(f) for f in self.summands])
+		if len(self.summands) > 1:
+			return '({})'.format(s)
+		else:
+			return s
 
 
 class Product(Function):
@@ -180,17 +216,24 @@ class Product(Function):
 
 	def derivative(self):
 		if len(self.factors) == 1:
-			return self.factors[0].derivative()
+			return self.factors[0].derivative().simplify()
 		elif len(self.factors) == 2:
-			return self.factors[0].derivative() * self.factors[1]\
-					+ self.factors[0] * self.factors[1].derivative()
-		return Product([Product(self.factors[0:2]), Product(self.factors[2:])]).derivative()
+			return (self.factors[0].derivative() * self.factors[1]\
+					+ self.factors[0] * self.factors[1].derivative()).simplify()
+		return Product([Product(self.factors[0:2]), Product(self.factors[2:])]).derivative().simplify()
 
 	def simplify(self):
+		factors = [f.simplify() for f in self.factors]
+		if 0 in [f.value for f in factors if isinstance(f, Constant)]:
+			return Constant(0)
 		return self
 
 	def __str__(self):
-		return '(' + ' * '.join([str(f) for f in self.factors]) + ')'
+		s = ' * '.join([str(f) for f in self.factors])
+		if len(self.factors) > 1:
+			return '({})'.format(s)
+		else:
+			return s
 
 
 class Modulo(Function):
@@ -203,7 +246,7 @@ class Modulo(Function):
 		return self.a.sample(x) % self.b.sample(x)
 
 	def derivative(self):
-		return self.a.derivative()
+		return self.a.derivative().simplify()
 
 	def simplify(self):
 		return self
@@ -222,8 +265,9 @@ class Fraction(Function):
 		return self.dividend.sample(x) / self.divisor.sample(x)
 
 	def derivative(self):
-		return (self.dividend.derivative() * self.divisor - self.dividend * self.divisor.derivative()) /\
-				self.divisor ** 2
+		return (self.dividend.derivative().simplify() * self.divisor\
+			- self.dividend * self.divisor.derivative().simplify()) /\
+				(self.divisor ** 2).simplify()
 
 	def simplify(self):
 		return self
@@ -241,7 +285,7 @@ class Sin(Function):
 		return math.sin(self.input.sample(x))
 
 	def derivative(self):
-		return Cos(self.input) * self.input.derivative()
+		return Cos(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
 		return self
@@ -259,7 +303,7 @@ class Cos(Function):
 		return math.cos(self.input.sample(x))
 
 	def derivative(self):
-		return -Sin(self.input) * self.input.derivative()
+		return -Sin(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
 		return self
@@ -278,6 +322,7 @@ class Pow(Function):
 		return self.base.sample(x) ** self.exponent.sample(x)
 
 	def derivative(self):
+		# TODO
 		return exponent * Pow(self.base, self.exponent - Constant(1))
 
 	def simplify(self):
@@ -295,7 +340,7 @@ class Exp(Function):
 		return math.exp(self.input.sample(x))
 
 	def derivative(self):
-		return Exp(self.input) * self.input.derivative()
+		return Exp(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
 		return self
