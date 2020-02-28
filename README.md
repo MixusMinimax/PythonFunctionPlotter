@@ -41,9 +41,9 @@ image
 
 ## TODOs
 
-- `derivative g(x)\*\*h(x)` only works if at least g or h is a constant. `derivative x**x` will return 0.
+- `derivative g(x)**h(x)` only works if at least g or h is a constant. `derivative x**x` will return 0.
   - TODO make it so that `t` is considered a constant, or more precicely any function not dependent on `x`
-  - TODO find an algorithm that derives any g(x)\*\*h(x)
+  - TODO find an algorithm that derives any `g(x)**h(x)`
 - TODO movable camera (scale axes independently)
 - TODO side panel with multiple functions
 - TODO name functions so that they can be referred to, but make sure to prevent infinite loops (maximum depth?)
