@@ -1,6 +1,6 @@
 # Function Plotter
 
-Plots functions. 
+Plots functions.  
 Type an expression and press enter.
 
 ## Features:
