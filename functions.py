@@ -35,6 +35,7 @@ class Function:
 		if derivative_level > 0:
 			t = '({}){}'.format(t, '.derivative()' * derivative_level)
 		f = eval('Constant(0)+' + t)
+		print(f)
 		if isinstance(f, Function):
 			f = f.simplify()
 			time_taken = time.time() - start
@@ -114,26 +115,6 @@ class Constant(Function):
 		return str(self.value)
 
 
-class Random(Function):
-
-	def __init__(self, seed):
-		seed = to_function(seed)
-		self.seed = seed
-
-	def sample(self, x):
-		random.seed(a=int((self.seed.sample(x) * 1000 + 0x7fffffff)))
-		return random.randint(0, 1000) / 1000.0
-
-	def derivative(self):
-		return Constant(0)
-
-	def simplify(self):
-		return self
-
-	def __str__(self):
-		return 'random({})'.format(self.seed)
-
-
 class X(Function):
 
 	def sample(self, x):
@@ -195,6 +176,11 @@ class Sum(Function):
 				changed = True
 				new_summands.append(Product((Constant(count), f)))
 
+		if len(new_summands) == 0:
+			return Constant(0)
+		elif len(new_summands) == 1:
+			return new_summands[0]
+
 		ret = Sum(new_summands)
 		return ret.simplify() if changed else ret
 
@@ -236,7 +222,7 @@ class Product(Function):
 		# simplify constants into one
 		simplified_constant = Constant(np.prod([f.value for f in factors if isinstance(f, Constant)]))
 		factors = [f for f in factors if not isinstance(f, Constant)]
-		if len(factors) == 0 or simplified_constant.value != 1:
+		if len(factors) == 0 or abs(simplified_constant.value - 1) > 1e-9:
 			factors.insert(0, simplified_constant)
 
 		# powerize sames
@@ -259,7 +245,13 @@ class Product(Function):
 				changed = True
 				new_factors.append(Pow(f, Constant(count)))
 
-		return Product(new_factors)
+		if len(new_factors) == 0:
+			return Constant(0)
+		elif len(new_factors) == 1:
+			return new_factors[0]
+
+		ret = Product(new_factors)
+		return ret.simplify() if changed else ret
 
 	def __str__(self):
 		s = ' * '.join([str(f) for f in self.factors])
@@ -282,7 +274,7 @@ class Modulo(Function):
 		return self.a.derivative().simplify()
 
 	def simplify(self):
-		return self
+		return self.a.simplify() % self.b.simplify()
 
 	def __str__(self):
 		return '{} % {}'.format(self.a, self.b)
@@ -303,7 +295,7 @@ class Fraction(Function):
 				(self.divisor ** 2).simplify()
 
 	def simplify(self):
-		return self
+		return self.dividend.simplify() / self.divisor.simplify()
 
 	def __str__(self):
 		return '{} / {}'.format(self.dividend, self.divisor)
@@ -321,7 +313,7 @@ class Sin(Function):
 		return Cos(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
-		return self
+		return Sin(self.input.simplify())
 
 	def __str__(self):
 		return 'sin({})'.format(self.input)
@@ -339,7 +331,7 @@ class Cos(Function):
 		return -Sin(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
-		return self
+		return Cos(self.input.simplify())
 
 	def __str__(self):
 		return 'cos({})'.format(self.input)
@@ -357,7 +349,7 @@ class Tan(Function):
 		return Fraction(1, Pow(Cos(self.input), 2)) * self.input.derivative().simplify()
 
 	def simplify(self):
-		return self
+		return Tan(self.input.simplify())
 
 	def __str__(self):
 		return 'tan({})'.format(self.input)
@@ -408,7 +400,10 @@ class Exp(Function):
 		return Exp(self.input) * self.input.derivative().simplify()
 
 	def simplify(self):
-		return Exp(self.input.simplify())
+		input = self.input.simplify()
+		if isinstance(input, Constant) and input.value == 0:
+			return Constant(1)
+		return Exp(input)
 
 	def __str__(self):
 		return 'exp({})'.format(self.input)
@@ -449,3 +444,23 @@ class Time(Function):
 
 	def __str__(self):
 		return 't'
+
+
+class Random(Function):
+
+	def __init__(self, seed):
+		seed = to_function(seed)
+		self.seed = seed
+
+	def sample(self, x):
+		random.seed(a=int((self.seed.sample(x) * 1000 + 0x7fffffff)))
+		return random.randint(0, 1000) / 1000.0
+
+	def derivative(self):
+		return Constant(0)
+
+	def simplify(self):
+		return Random(self.seed.simplify())
+
+	def __str__(self):
+		return 'random({})'.format(self.seed)

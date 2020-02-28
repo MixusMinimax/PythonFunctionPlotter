@@ -27,7 +27,7 @@ MAX_Y = 6.5
 DRAW_POINTS = False
 
 # pygame
-textinput = pygame_textinput.TextInput()
+textinput = pygame_textinput.TextInput(initial_string="derivative sin(x+1)")
 
 game_display = pygame.display.set_mode((WIDTH, HEIGHT + INPUT_HEIGHT))
 pygame.display.set_caption('2D Function Plotter')
