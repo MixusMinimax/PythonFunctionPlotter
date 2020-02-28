@@ -8,12 +8,12 @@ type an expression and press enter
 
 ### Functions:
  - basic python operators
-     - +
-     - -
-     - *
-     - /
-     - **
-     - %
+     - \+
+     - \-
+     - \*
+     - \/
+     - \**
+     - \%
  - x              # the function's input
  - c              # real constant
  - sin(h(x))
