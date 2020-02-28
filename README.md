@@ -24,11 +24,11 @@ Type an expression and press enter.
 |                                              |     |
 | --------------------------------------------:|:---:|
 |                                           `x`| <img src="https://i.imgur.com/JEB9lWZ.png" width="256px" /> |
-|                                    `x**2 + 1`|image|
-|                                    `exp(2*x)`|image|
-|                                    `sin(x-t)`|image|
-|                    `derivative sin(2*exp(x))`|image|
-|`derivative derivative exp(2*x**3 + x**2 + x)`|image|
+|                                    `x**2 + 1`| <img src="https://i.imgur.com/HlaQSd7.png" width="256px" /> |
+|                                    `exp(2*x)`| <img src="https://i.imgur.com/gB63azZ.png" width="256px" /> |
+|                                    `sin(x-t)`| <img src="https://i.imgur.com/ezimZJN.gif" width="256px" /> |
+|                    `derivative sin(2*exp(x))`| <img src="https://i.imgur.com/JEB9lWZ.png" width="256px" /> |
+|`derivative derivative exp(2*x**3 + x**2 + x)`| <img src="https://i.imgur.com/JEB9lWZ.png" width="256px" /> |
 
 ## TODOs
 
