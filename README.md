@@ -21,7 +21,7 @@ Type an expression and press enter.
 
 ## Examples
 
-|||
+
 |-:|:-:|
 |`x`|image|
 |`x**2 + 1`|image|
