@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 time = 0
 
 replaces = [('x', 'X()'), ('exp', 'Exp'), ('ln', 'Ln'), ('sin', 'Sin'), ('cos', 'Cos'),\
-	('random', 'Random'), ('t', 'Time()')]
+	('tan', 'Tan'),('random', 'Random'), ('t', 'Time()')]
 
 def check_function(function):
 	if not isinstance(function, Function):
@@ -27,8 +27,12 @@ class Function:
 	def parse(t):
 		for pair in replaces:
 			t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
-		if t.startswith('derivative '):
-			t = '({}).derivative()'.format(t[len('derivative '):])
+		derivative_level = 0
+		while t.startswith('derivative '):
+			t = t[len('derivative '):]
+			derivative_level += 1
+		if derivative_level > 0:
+			t = '({}){}'.format(t, '.derivative()' * derivative_level)
 		f = eval('Constant(0)+' + t)
 		if isinstance(f, Function):
 			return f.simplify()
@@ -50,7 +54,6 @@ class Function:
 		return -1 * self
 
 	def __add__(self, other):
-		other = to_function(other)
 		return Sum((self, other))
 
 	def __radd__(self, other):
@@ -58,7 +61,6 @@ class Function:
 		return self + other
 
 	def __sub__(self, other):
-		other = to_function(other)
 		return Sum((self, -other))
 
 	def __rsub__(self, other):
@@ -66,7 +68,6 @@ class Function:
 		return Constant(other) - self
 
 	def __mul__(self, other):
-		other = to_function(other)
 		return Product((self, other))
 
 	def __rmul__(self, other):
@@ -74,20 +75,16 @@ class Function:
 		return self * other
 
 	def __mod__(self, other):
-		other = to_function(other)
 		return Modulo(self, other)
 
 	def __truediv__(self, other):
-		other = to_function(other)
 		return Fraction(self, other)
 
 	def __rtruediv__(self, other):
-		if isinstance(other, (int, float)):
-			return Constant(other) / self
-		raise TypeError
+		if not isinstance(other, (int, float)): raise TypeError
+		return Constant(other) / self
 
 	def __pow__(self, other):
-		other = to_function(other)
 		return Pow(self, other)
 
 	def __rpow__(self, other):
@@ -116,9 +113,7 @@ class Constant(Function):
 class Random(Function):
 
 	def __init__(self, seed):
-		if isinstance(seed, (int, float)):
-			seed = Constant(seed)
-		if not isinstance(seed, Function): raise TypeError
+		seed = to_function(seed)
 		self.seed = seed
 
 	def sample(self, x):
@@ -153,7 +148,7 @@ class X(Function):
 class Sum(Function):
 
 	def __init__(self, summands):
-		self.summands = summands
+		self.summands = tuple([to_function(f) for f in summands])
 
 	def sample(self, x):
 		return sum((f.sample(x) for f in self.summands))
@@ -210,7 +205,7 @@ class Sum(Function):
 class Product(Function):
 
 	def __init__(self, factors):
-		self.factors = factors
+		self.factors = tuple([to_function(f) for f in factors])
 
 	def sample(self, x):
 		return np.prod([f.sample(x) for f in self.factors])
@@ -238,9 +233,29 @@ class Product(Function):
 		simplified_constant = Constant(np.prod([f.value for f in factors if isinstance(f, Constant)]))
 		factors = [f for f in factors if not isinstance(f, Constant)]
 		if len(factors) == 0 or simplified_constant.value != 1:
-			factors.append(simplified_constant)
+			factors.insert(0, simplified_constant)
 
-		return Product(factors)
+		# powerize sames
+		counts = dict()
+		for f in factors:
+			if str(f) in counts:
+				counts[str(f)][1] += 1
+			else:
+				counts[str(f)] = [f, 1]
+
+		changed = False
+		new_factors = []
+		for key in counts:
+			pair = counts[key]
+			f = pair[0]
+			count = pair[1]
+			if count == 1:
+				new_factors.append(f)
+			elif count > 1:
+				changed = True
+				new_factors.append(Pow(f, Constant(count)))
+
+		return Product(new_factors)
 
 	def __str__(self):
 		s = ' * '.join([str(f) for f in self.factors])
@@ -253,8 +268,8 @@ class Product(Function):
 class Modulo(Function):
 
 	def __init__(self, a, b):
-		self.a = a
-		self.b = b
+		self.a = to_function(a)
+		self.b = to_function(b)
 
 	def sample(self, x):
 		return self.a.sample(x) % self.b.sample(x)
@@ -272,8 +287,8 @@ class Modulo(Function):
 class Fraction(Function):
 
 	def __init__(self, dividend, divisor):
-		self.dividend = dividend
-		self.divisor = divisor
+		self.dividend = to_function(dividend)
+		self.divisor = to_function(divisor)
 
 	def sample(self, x):
 		return self.dividend.sample(x) / self.divisor.sample(x)
@@ -293,7 +308,7 @@ class Fraction(Function):
 class Sin(Function):
 
 	def __init__(self, input):
-		self.input = input
+		self.input = to_function(input)
 
 	def sample(self, x):
 		return math.sin(self.input.sample(x))
@@ -311,7 +326,7 @@ class Sin(Function):
 class Cos(Function):
 
 	def __init__(self, input):
-		self.input = input
+		self.input = to_function(input)
 
 	def sample(self, x):
 		return math.cos(self.input.sample(x))
@@ -326,22 +341,53 @@ class Cos(Function):
 		return 'cos({})'.format(self.input)
 
 
+class Tan(Function):
+
+	def __init__(self, input):
+		self.input = to_function(input)
+
+	def sample(self, x):
+		return math.tan(self.input.sample(x))
+
+	def derivative(self):
+		return Fraction(1, Pow(Cos(self.input), 2)) * self.input.derivative().simplify()
+
+	def simplify(self):
+		return self
+
+	def __str__(self):
+		return 'tan({})'.format(self.input)
+
+
 class Pow(Function):
 
 	def __init__(self, base, exponent):
-		self.base = base
-		self.exponent = exponent
+		self.base = to_function(base)
+		self.exponent = to_function(exponent)
 
 	def sample(self, x):
 		return self.base.sample(x) ** self.exponent.sample(x)
 
 	def derivative(self):
 		# TODO
-
-		return exponent * Pow(self.base, self.exponent - Constant(1))
+		base = self.base.simplify()
+		exponent = self.exponent.simplify()
+		if isinstance(base, Constant) and isinstance(exponent, Constant):
+			return Constant(0)
+		if isinstance(base, Constant):
+			return (Ln(base) * self * exponent.derivative()).simplify()
+		if isinstance(exponent, Constant):
+			return (exponent * (base ** Constant(exponent.value - 1)) * base.derivative()).simplify()
+		raise NotImplementedError
 
 	def simplify(self):
-		return self
+		base = self.base.simplify()
+		exponent = self.exponent.simplify()
+		if isinstance(base, Constant) and base.value == 1:
+			return Constant(1)
+		if isinstance(exponent, Constant) and exponent.value == 1:
+			return base
+		return base ** exponent
 
 	def __str__(self):
 		return '{}^{}'.format(self.base, self.exponent)
@@ -349,7 +395,7 @@ class Pow(Function):
 class Exp(Function):
 
 	def __init__(self, input):
-		self.input = input
+		self.input = to_function(input)
 
 	def sample(self, x):
 		return math.exp(self.input.sample(x))
@@ -363,10 +409,11 @@ class Exp(Function):
 	def __str__(self):
 		return 'exp({})'.format(self.input)
 
+
 class Ln(Function):
 
 	def __init__(self, input):
-		self.input = input
+		self.input = to_function(input)
 
 	def sample(self, x):
 		return math.log(self.input.sample(x))
