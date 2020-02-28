@@ -23,7 +23,7 @@ Type an expression and press enter.
 
 |                                              |     |
 | --------------------------------------------:|:---:|
-|                                           `x`| ![x](https://i.imgur.com/JEB9lWZ.png =250x) |
+|                                           `x`| ![x](https://i.imgur.com/JEB9lWZ.png =100x20) |
 |                                    `x**2 + 1`|image|
 |                                    `exp(2*x)`|image|
 |                                    `sin(x-t)`|image|
