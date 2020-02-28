@@ -6,7 +6,7 @@ Type an expression and press enter.
 ## Features
 
 | f(x)            | Description              |
-|-----------------|--------------------------|
+| ---------------:| ------------------------ |
 | \+, \-, \*, \/, \*\*, \% | basic arithmetic operations |
 | x               | the function's input     |
 | c               | real constant            |
@@ -21,23 +21,14 @@ Type an expression and press enter.
 
 ## Examples
 
-`x`  
-image
-
-`x**2 + 1`  
-image
-
-`exp(2*x)`  
-image
-
-`sin(x-t)`  
-image
-
-`derivative sin(2*exp(x))`  
-image
-
-`derivative derivative exp(2*x**3 + x**2 + x)`  
-image
+|||
+|-:|:-:|
+|`x`|image|
+|`x**2 + 1`|image|
+|`exp(2*x)`|image|
+|`sin(x-t)`|image|
+|`derivative sin(2*exp(x))`|image|
+|`derivative derivative exp(2*x**3 + x**2 + x)`|image|
 
 ## TODOs
 
