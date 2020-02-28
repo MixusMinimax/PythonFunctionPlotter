@@ -185,7 +185,7 @@ def main():
 			
 		# logic
 		update(function)
-		functions.time += 1
+		functions.current_time += 1
 		game_display.blit(textinput.get_surface(), (10, HEIGHT + 10))
 		pygame.display.update()
 		clock.tick(60)

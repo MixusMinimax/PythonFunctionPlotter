@@ -5,7 +5,7 @@ import random
 import re
 from abc import ABCMeta, abstractmethod
 
-time = 0
+current_time = 0
 
 replaces = [('x', 'X()'), ('exp', 'Exp'), ('ln', 'Ln'), ('sin', 'Sin'), ('cos', 'Cos'),\
 	('tan', 'Tan'),('random', 'Random'), ('t', 'Time()')]
@@ -25,6 +25,7 @@ def to_function(value):
 class Function:
 
 	def parse(t):
+		start = time.time()
 		for pair in replaces:
 			t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
 		derivative_level = 0
@@ -35,7 +36,10 @@ class Function:
 			t = '({}){}'.format(t, '.derivative()' * derivative_level)
 		f = eval('Constant(0)+' + t)
 		if isinstance(f, Function):
-			return f.simplify()
+			f = f.simplify()
+			time_taken = time.time() - start
+			print('Time taken: {}s'.format(time_taken))
+			return f
 		raise TypeError
 
 	@abstractmethod
@@ -435,7 +439,7 @@ class Ln(Function):
 class Time(Function):
 
 	def sample(self, x):
-		return time / 60
+		return current_time / 60
 
 	def derivative(self):
 		return Constant(0)
