@@ -7,10 +7,12 @@ Type an expression and press enter.
 
 |    Function     |       Description        |
 |-----------------|--------------------------|
+| \+, \-, \*, \/, \*\*, \% | basic arithmetic operations |
 | x               | the function's input     |
 | c               | real constant            |
 | sin(h(x))       |                          |
 | cos(h(x))       |                          |
+| tan(h(x))       |                          |
 | exp(h(x))       |                          |
 | ln(h(x))        |                          |
 | derivative h(x) |                          |
