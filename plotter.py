@@ -142,7 +142,7 @@ def update(function):
 			exceed_new = 0
 
 		if y == None or exceed * exceed_new == -1:
-			if len(points) != 0:
+			if len(points) > 1:
 				points_list.append(points)
 				points = []
 		exceed = exceed_new
@@ -151,7 +151,7 @@ def update(function):
 		except:
 			pass
 
-		if i == RESOLUTION - 2 and len(points) != 0:
+		if i == RESOLUTION - 2 and len(points) > 1:
 			points_list.append(points)
 
 	# draw graph
