@@ -14,12 +14,21 @@ def check_function(function):
 	if not isinstance(function, Function):
 		raise TypeError
 
+# Turns numberes into Constants, but does nothing to functions
+def to_function(value):
+	if isinstance(value, (int, float)):
+		return Constant(value)
+	if not isinstance(value, Function): raise TypeError
+	return value
+
 
 class Function:
 
 	def parse(t):
 		for pair in replaces:
 			t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
+		if t.startswith('derivative '):
+			t = '({}).derivative()'.format(t[len('derivative '):])
 		f = eval('Constant(0)+' + t)
 		if isinstance(f, Function):
 			return f.simplify()
@@ -41,43 +50,35 @@ class Function:
 		return -1 * self
 
 	def __add__(self, other):
-		if isinstance(other, (int, float)):
-			return Sum((self, Constant(other)))
-		if not isinstance(other, Function): raise TypeError
+		other = to_function(other)
 		return Sum((self, other))
 
 	def __radd__(self, other):
+		if not isinstance(other, (int, float)): raise TypeError
 		return self + other
 
 	def __sub__(self, other):
-		if isinstance(other, (int, float)):
-			return sum((self, Constant(-other)))
-		if not isinstance(other, Function): raise TypeError
-		return Sum((self, -1 * other))
+		other = to_function(other)
+		return Sum((self, -other))
 
 	def __rsub__(self, other):
 		if not isinstance(other, (int, float)): raise TypeError
 		return Constant(other) - self
 
 	def __mul__(self, other):
-		if isinstance(other, (int, float)):
-			return Product((self, Constant(other)))
-		if not isinstance(other, Function): raise TypeError
+		other = to_function(other)
 		return Product((self, other))
 
 	def __rmul__(self, other):
+		if not isinstance(other, (int, float)): raise TypeError
 		return self * other
 
 	def __mod__(self, other):
-		if isinstance(other, (int, float)):
-			return Modulo(self, Constant(other))
-		if not isinstance(other, Function): raise TypeError
+		other = to_function(other)
 		return Modulo(self, other)
 
 	def __truediv__(self, other):
-		if isinstance(other, (int, float)):
-			return Product((self, Constant(1 / other)))
-		if not isinstance(other, Function): raise TypeError
+		other = to_function(other)
 		return Fraction(self, other)
 
 	def __rtruediv__(self, other):
@@ -86,15 +87,12 @@ class Function:
 		raise TypeError
 
 	def __pow__(self, other):
-		if isinstance(other, (int, float)):
-			return Pow(self, Constant(other))
-		if not isinstance(other, Function): raise TypeError
+		other = to_function(other)
 		return Pow(self, other)
 
 	def __rpow__(self, other):
-		if isinstance(other, (int, float)):
-			return Constant(other) ** self
-		raise TypeError
+		if not isinstance(other, (int, float)): raise TypeError
+		return Constant(other) ** self
 
 
 class Constant(Function):
@@ -339,6 +337,7 @@ class Pow(Function):
 
 	def derivative(self):
 		# TODO
+
 		return exponent * Pow(self.base, self.exponent - Constant(1))
 
 	def simplify(self):
@@ -376,7 +375,11 @@ class Ln(Function):
 		return self.input.derivative().simplify() / self.input
 
 	def simplify(self):
-		return Ln(self.input.simplify())
+		input = self.input.simplify()
+		if isinstance(input, Constant) and input.value == 1:
+			return Constant(0)
+		return Ln(input)
+
 
 	def __str__(self):
 		return 'ln({})'.format(self.input)
