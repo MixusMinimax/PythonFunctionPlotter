@@ -15,7 +15,7 @@ Type an expression and press enter.
 | ln(h(x))        |                          |
 | derivative h(x) |                          |
 | random(h(x))    | h(x) is used as the seed |
-| t               | current time in seconde  |
+| t               | current time in seconds  |
 
 ## Examples:
 
