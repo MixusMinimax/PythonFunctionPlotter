@@ -19,7 +19,14 @@ Type an expression and press enter
 
 ## Examples:
 
-```
-asd
-```
-\frac{1}{2}
+`x`
+
+`x**2 + 1`
+
+`exp(2*x)`
+
+`sin(x-t)`
+
+`derivative sin(2*exp(x))`
+
+`derivative derivative exp(2*x**3 + x**2 + x)`
