@@ -1,12 +1,10 @@
 # Function Plotter
 
 Plots functions.
+Type an expression and press enter
 
-## Usage:
+## Features:
 
-type an expression and press enter
-
-### Functions:
 |    Function     |       Description        |
 |-----------------|--------------------------|
 | x               | the function's input     |
@@ -18,3 +16,10 @@ type an expression and press enter
 | derivative h(x) |                          |
 | random(h(x))    | h(x) is used as the seed |
 | t               | current time in seconde  |
+
+## Examples:
+
+```
+asd
+```
+\frac{1}{2}
