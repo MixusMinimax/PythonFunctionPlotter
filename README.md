@@ -33,15 +33,15 @@ Type an expression and press enter.
 ## TODOs
 
 - `derivative g(x)**h(x)` only works if at least g or h is a constant. `derivative x**x` will return 0.
-  - TODO make it so that `t` is considered a constant, or more precicely any function not dependent on `x`
-  - TODO find an algorithm that derives any `g(x)**h(x)`
-- TODO movable camera (scale axes independently)
-- TODO side panel with multiple functions
-- TODO name functions so that they can be referred to, but make sure to prevent infinite loops (maximum depth?)
-- TODO adjustable colour scheme
-- TODO maybe instead of window render to image so that it can be embedded in any pygame application?
-- TODO autocomplete for `derivative` and other things (start typing and press tab? or shortcut)
-- TODO give each function a random color, make it adjustable
-- TODO 3d? (either orthographic view or 2d image with either hue or brightness as z-axis)
-- TODO perlin noise (2d / 3d)
-- TODO perspective view and movable 3d camera? (maybe should switch to opengl for this)
+  - [ ] make it so that `t` is considered a constant, or more precicely any function not dependent on `x`
+  - [ ] find an algorithm that derives any `g(x)**h(x)`
+- [ ] movable camera (scale axes independently)
+- [ ] side panel with multiple functions
+- [ ] name functions so that they can be referred to, but make sure to prevent infinite loops (maximum depth?)
+- [ ] adjustable colour scheme
+- [x] maybe instead of window render to image so that it can be embedded in any pygame application?
+- [ ] autocomplete for `derivative` and other things (start typing and press tab? or shortcut)
+- [ ] give each function a random color, make it adjustable
+- [ ] 3d? (either orthographic view or 2d image with either hue or brightness as z-axis)
+- [ ] perlin noise (2d / 3d)
+- [ ] perspective view and movable 3d camera? (maybe should switch to opengl for this)
