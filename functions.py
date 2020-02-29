@@ -21,10 +21,8 @@ def to_function(value):
 	if not isinstance(value, Function): raise TypeError
 	return value
 
-
-class Function:
-
-	def parse(t):
+def parse(t):
+	try:
 		start = time.time()
 		for pair in replaces:
 			t = re.sub(r'\b%s\b'% pair[0], pair[1], t)
@@ -34,7 +32,8 @@ class Function:
 			derivative_level += 1
 		if derivative_level > 0:
 			t = '({}){}'.format(t, '.derivative()' * derivative_level)
-		f = eval('Constant(0)+' + t)
+		print(t)
+		f = to_function(eval(t))
 		print(f)
 		if isinstance(f, Function):
 			f = f.simplify()
@@ -42,6 +41,15 @@ class Function:
 			print('Time taken: {}s'.format(time_taken))
 			return f
 		raise TypeError
+	except:
+		return None
+
+def update(dt):
+	global current_time 
+	current_time += dt
+
+
+class Function:
 
 	@abstractmethod
 	def sample(self, x):
@@ -434,7 +442,7 @@ class Ln(Function):
 class Time(Function):
 
 	def sample(self, x):
-		return current_time / 60
+		return current_time
 
 	def derivative(self):
 		return Constant(0)
