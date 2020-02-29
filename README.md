@@ -32,7 +32,7 @@ Type an expression and press enter.
 
 ## TODOs
 
-- `derivative g(x)**h(x)` only works if at least g or h is a constant. `derivative x**x` will return 0.
+- [ ] `derivative g(x)**h(x)` only works if at least g or h is a constant. `derivative x**x` will return 0.
   - [ ] make it so that `t` is considered a constant, or more precicely any function not dependent on `x`
   - [ ] find an algorithm that derives any `g(x)**h(x)`
 - [ ] movable camera (scale axes independently)
