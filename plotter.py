@@ -28,7 +28,7 @@ class Plotter:
 		if not isinstance(size, abc.Iterable) or len(size) != 2: raise TypeError
 		self.size = size
 		self.image = pygame.Surface(size, pygame.SRCALPHA)
-		self.function = initial_function
+		self.function = functions.parse(initial_function)
 		self.current_time = 0
 		self.verbose = verbose
 
