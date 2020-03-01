@@ -2,7 +2,6 @@ import math
 import pygame_textinput
 import pygame
 import re
-from point import Point
 import functions
 from utils import *
 from collections import abc
