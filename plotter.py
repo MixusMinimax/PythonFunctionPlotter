@@ -13,15 +13,6 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 
-# constants
-RESOLUTION = 256
-LINE_OFFSET = 32
-MIN_X = -5
-MAX_X = 5
-MIN_Y = -1
-MAX_Y = 6.5
-DRAW_POINTS = False
-
 # fonts
 font = pygame.font.SysFont('Arial', 12)
 font2 = pygame.font.SysFont('Arial', 16)
@@ -32,23 +23,56 @@ text_y = font.render('Y', True, BLACK)
 
 class Plotter:
 
-	def __init__(self, size):
+	def __init__(self, size, initial_function=None, resolution=256, line_offset=32,\
+		x_range=(-5, 5), y_range=(-1, 6.5),\
+		draw_points=False, verbose=True):
 		if not isinstance(size, abc.Iterable) or len(size) != 2: raise TypeError
 		self.size = size
 		self.image = pygame.Surface(size, pygame.SRCALPHA)
+		self.function = initial_function
+		self.current_time = 0
+		self.verbose = verbose
+
+		self.RESOLUTION = resolution
+		self.LINE_OFFSET = line_offset
+		self.MIN_X = x_range[0]
+		self.MAX_X = x_range[1]
+		self.MIN_Y = y_range[0]
+		self.MAX_Y = y_range[1]
+		self.DRAW_POINTS = draw_points
 
 	def uv_to_screen(self, point):
 		copy = Point(point)
 		copy.x = copy.x
 		copy.y = 1 - copy.y
-		copy = copy * (self.size[0] - 2 * LINE_OFFSET, self.size[1] - 2 * LINE_OFFSET) + (LINE_OFFSET, LINE_OFFSET)
+		copy = copy * (self.size[0] - 2 * self.LINE_OFFSET, self.size[1] - 2 * self.LINE_OFFSET)\
+		+ (self.LINE_OFFSET, self.LINE_OFFSET)
 		return copy
 
 	def get_surface(self):
 		return self.image
 
-	def update(self, function):
+	def set_function(self, f):
+		f = functions.parse(f, verbose=self.verbose)
+		if f:
+			self.function = f
+
+	def update(self, dt):
 		self.image.fill((0, 0, 0, 0))
+
+		self.current_time += dt
+		function = self.function
+		functions.current_time = self.current_time
+
+		# copy readonly attributes into the scope of this function
+
+		RESOLUTION = self.RESOLUTION
+		LINE_OFFSET = self.LINE_OFFSET
+		MIN_X = self.MIN_X
+		MAX_X = self.MAX_X
+		MIN_Y = self.MIN_Y
+		MAX_Y = self.MAX_Y
+		DRAW_POINTS = self.DRAW_POINTS
 
 		# draw zero lines
 		col = (150, 150, 150)
@@ -123,6 +147,9 @@ class Plotter:
 		self.image.blit(text, bottom - (text.get_width() // 2, -8))
 		text = font.render(str(MAX_X), True, BLACK)
 		self.image.blit(text, right - (text.get_width() // 2, -8))
+
+		if not function:
+			return
 
 		# get points
 		points_list = []

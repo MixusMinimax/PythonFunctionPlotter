@@ -21,7 +21,8 @@ def to_function(value):
 	if not isinstance(value, Function): raise TypeError
 	return value
 
-def parse(t):
+def parse(t, verbose=True):
+	if isinstance(t, Function): return t
 	try:
 		start = time.time()
 		for pair in replaces:
@@ -32,21 +33,19 @@ def parse(t):
 			derivative_level += 1
 		if derivative_level > 0:
 			t = '({}){}'.format(t, '.derivative()' * derivative_level)
-		print(t)
+		if verbose: print('===[PARSING]===')
+		if verbose: print('Input:      {}'.format(t))
 		f = to_function(eval(t))
-		print(f)
+		if verbose: print('Result:     {}'.format(f))
 		if isinstance(f, Function):
 			f = f.simplify()
 			time_taken = time.time() - start
-			print('Time taken: {}s'.format(time_taken))
+			if verbose: print('Time taken: {}s'.format(time_taken))
 			return f
 		raise TypeError
 	except:
+		if verbose: print('Invalid Input')
 		return None
-
-def update(dt):
-	global current_time 
-	current_time += dt
 
 
 class Function:
