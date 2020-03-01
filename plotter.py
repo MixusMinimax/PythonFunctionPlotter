@@ -30,7 +30,7 @@ class Plotter:
 		self.image = pygame.Surface(size, pygame.SRCALPHA)
 		self.function = functions.parse(initial_function)
 		self.current_time = 0
-		self.verbose = verbose
+		self.VERBOSE = verbose
 
 		self.RESOLUTION = resolution
 		self.LINE_OFFSET = line_offset
@@ -50,7 +50,7 @@ class Plotter:
 		return self.image
 
 	def set_function(self, f):
-		f = functions.parse(f, verbose=self.verbose)
+		f = functions.parse(f, verbose=self.VERBOSE)
 		if f:
 			self.function = f
 
