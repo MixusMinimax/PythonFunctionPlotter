@@ -34,10 +34,8 @@ class Plotter:
 
 		self.RESOLUTION = resolution
 		self.LINE_OFFSET = line_offset
-		self.MIN_X = x_range[0]
-		self.MAX_X = x_range[1]
-		self.MIN_Y = y_range[0]
-		self.MAX_Y = y_range[1]
+		self.X_RANGE = x_range
+		self.Y_RANGE = y_range
 		self.DRAW_POINTS = draw_points
 
 	def uv_to_screen(self, point):
@@ -67,10 +65,10 @@ class Plotter:
 
 		RESOLUTION = self.RESOLUTION
 		LINE_OFFSET = self.LINE_OFFSET
-		MIN_X = self.MIN_X
-		MAX_X = self.MAX_X
-		MIN_Y = self.MIN_Y
-		MAX_Y = self.MAX_Y
+		MIN_X = self.X_RANGE[0]
+		MAX_X = self.X_RANGE[1]
+		MIN_Y = self.Y_RANGE[0]
+		MAX_Y = self.Y_RANGE[1]
 		DRAW_POINTS = self.DRAW_POINTS
 
 		# draw zero lines
