@@ -1,9 +1,49 @@
 # Function Plotter
 
-Plots functions.  
-Type an expression and press enter.
+Plots functions into a pygame-surface, which can then be drawn into any pygame program.  
+`app.py` shows how to do that, by making use of the plotter to draw the function that the user types into the window.
 
-## Features
+## Usage
+
+### TL,DR
+
+1. Initialize a Plotter instance with a size: `p = Plotter((800, 800))`
+2. Set the function: `p.set_function('derivative exp(x**2 - sin(x))')`
+3. Update the plotter each frame with the time-delta (for time-dependent functions): `p.update(1/60)`
+4. Blit the provided surface into the window or any other surface: `display.blit(p.get_surface(), (0, 0))`
+
+### Attributes
+
+| Name               | Default value | Description                                 |
+| ------------------ | ------------- | ------------------------------------------- |
+| `RESOLUTION`       | 256           | Amount of sample points for graph           |
+| `LINE_OFFSET`      | 32            | Distance of axes from the edge              |
+| `X_RANGE`          | (-5, 5)       | Min and Max values for x-axis               |
+| `Y_RANGE`          | (-1, 6.5)     | Min and Max values for y-axis               |
+| `DRAW_POINTS`      | False         | Draw circle at every sample-point           |
+| `VERBOSE`          | True          | Print parsing information                   |
+
+### Constructor Parameters
+
+| Name               | Default value | Description                                 |
+| ------------------ | ------------- | ------------------------------------------- |
+| `size`             |               | Dimensions of render target                 |
+| `initial_function` | None          | Initial value of the function to render     |
+
+All attributes are included as well, however, in lower-case (e.g. `x_range` instead of `X_RANGE`)
+
+### Methods
+
+| Name           | Parameters                           | Description                         |
+| -------------- | ------------------------------------ | ----------------------------------- |
+| `get_surface`  |                                      | returns the render image            |
+| `set_function` | f(str/Function)                      | sets the function to render         |
+| `update`       | dt(int/float): time-delta in seconds | calculates graph, renders to target |
+
+
+### Function Syntax
+
+The function passed into `set_function` has to be any arithmetic expression using the following functions, operations, and variables.
 
 | f(x)            | Description              |
 | ---------------:| ------------------------ |
@@ -20,6 +60,8 @@ Type an expression and press enter.
 | random(g(x))    | g(x) is used as the seed |
 
 ## Examples
+
+Try out `app.py` to play around with the plotter. Start typing an expression and press Enter to display the function.
 
 |                                              |     |
 | --------------------------------------------:|:---:|
@@ -38,8 +80,8 @@ Type an expression and press enter.
 - [ ] movable camera (scale axes independently)
 - [ ] side panel with multiple functions
 - [ ] name functions so that they can be referred to, but make sure to prevent infinite loops (maximum depth?)
-- [ ] adjustable colour scheme
-- [x] maybe instead of window render to image so that it can be embedded in any pygame application?
+- [x] ~~adjustable colour scheme~~ transparent background
+- [x] render to image instead of window, so that the user has more control
 - [ ] autocomplete for `derivative` and other things (start typing and press tab? or shortcut)
 - [ ] give each function a random color, make it adjustable
 - [ ] 3d? (either orthographic view or 2d image with either hue or brightness as z-axis)
