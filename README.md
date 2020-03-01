@@ -5,7 +5,7 @@ Plots functions into a pygame-surface, which can then be drawn into any pygame p
 
 ## Usage
 
-### TL,DR
+### TL;DR
 
 1. Initialize a Plotter instance with a size: `p = Plotter((800, 800))`
 2. Set the function: `p.set_function('derivative exp(x**2 - sin(x))')`
