@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 
 current_time = 0
 
-replaces = [('x', 'X()'), ('exp', 'Exp'), ('ln', 'Ln'), ('sin', 'Sin'), ('cos', 'Cos'),\
+replaces = [('x', 'X()'), ('exp', 'Exp'), ('ln', 'Ln'), ('sqrt', 'Sqrt'), ('sin', 'Sin'), ('cos', 'Cos'),\
 	('tan', 'Tan'),('random', 'Random'), ('t', 'Time()')]
 
 def check_function(function):
@@ -436,6 +436,29 @@ class Ln(Function):
 
 	def __str__(self):
 		return 'ln({})'.format(self.input)
+
+
+class Sqrt(Function):
+
+	def __init__(self, input):
+		self.input = input
+
+	def sample(self, x):
+		return math.sqrt(self.input.sample(x))
+
+	def derivative(self):
+		return Constant(0.5) * self.input.derivative().simplify() / Sqrt(self.input)
+
+	def simplify(self):
+		input = self.input.simplify()
+		if isinstance(input, Constant):
+			n = math.sqrt(input.value)
+			if n == int(n):
+				return Constant(n)
+		return Sqrt(self.input.simplify())
+
+	def __str__(self):
+		return 'sqrt({})'.format(self.input)
 
 
 class Time(Function):
