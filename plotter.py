@@ -39,6 +39,9 @@ class Plotter:
 		self.DRAW_POINTS = draw_points
 
 	def uv_to_screen(self, point):
+		if point[0] == None or point[1] == None: raise Exception
+		if not isinstance(point[0], (int, float)) or not isinstance(point[1], (int, float)):
+			raise TypeError
 		copy = Point(point)
 		copy.x = copy.x
 		copy.y = 1 - copy.y
