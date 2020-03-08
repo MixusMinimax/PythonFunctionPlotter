@@ -12,7 +12,7 @@ def main():
 	pygame.display.set_caption('2D Function Plotter')
 
 	clock = pygame.time.Clock()
-	p = Plotter((WIDTH, HEIGHT), verbose=VERBOSE)
+	p = Plotter((WIDTH, HEIGHT), resolution=1024, verbose=VERBOSE)
 	textinput = pygame_textinput.TextInput(initial_string='(exp(x) + exp(-x)) / 2 + random(x) * 0.2')
 	p.set_function(textinput.get_text())
 
